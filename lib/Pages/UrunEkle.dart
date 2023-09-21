@@ -1,12 +1,13 @@
 // ignore_for_file: must_be_immutable
 
-import 'dart:collection';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
+import 'package:stok_satis_takip/Controller/SnackController.dart';
+import 'package:stok_satis_takip/Controller/UrunController.dart';
 import 'package:stok_satis_takip/Controller/VibrationController.dart';
 import 'package:stok_satis_takip/Cores/Urunler.dart';
 import 'package:stok_satis_takip/Pages/botnavbar.dart';
@@ -32,86 +33,11 @@ class UrunEklePage extends StatelessWidget {
 
   var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
 
-  Future<void> urunKayit(String urun_barkod, String urun_ad, int urun_adet,
-      int urun_fiyat, int urun_kurus) async {
-    try {
-      if (urun_barkod.isEmpty ||
-          urun_ad.isEmpty ||
-          urun_adet <= 0 ||
-          urun_fiyat <= 0 ||
-          urun_kurus < 0 ||
-          urun_kurus > 99) {
-        // Hatalı giriş durumunda kırmızı arkaplanlı snackbar göster
-        Get.snackbar("Hata", "Lütfen geçerli bilgileri girin",
-            backgroundColor: const Color.fromARGB(255, 119, 11, 3),
-            snackPosition: SnackPosition.BOTTOM);
-        return;
-      }
-
-      var urun = HashMap<String, dynamic>();
-      urun["urun_barkod"] = urun_barkod;
-      urun["urun_ad"] = urun_ad;
-      urun["urun_adet"] = urun_adet;
-      urun["urun_fiyat"] = urun_fiyat;
-      urun["urun_kurus"] = urun_kurus;
-      await refUrun.push().set(urun);
-      Get.offAllNamed("/");
-
-      // Başarılı olduğunda yeşil arkaplanlı snackbar göster
-      Get.snackbar("Başarılı", "Kayıt Başarıyla Tamamlandı",
-          backgroundColor: const Color.fromARGB(255, 2, 108, 6),
-          snackPosition: SnackPosition.BOTTOM);
-    } catch (error) {
-      // Hata alındığında kırmızı arkaplanlı snackbar göster
-      Get.snackbar("Hata", "Hata: $error",
-          backgroundColor: const Color.fromARGB(255, 119, 11, 3),
-          snackPosition: SnackPosition.BOTTOM);
-    }
-  }
-
-  Future<void> barkodKontrolSnack(bool exists) async {
-    if (exists) {
-      Get.showSnackbar(const GetSnackBar(
-        margin: EdgeInsets.only(bottom: 20),
-        borderRadius: 20,
-        borderColor: Color.fromARGB(255, 53, 1, 2),
-        icon: Icon(
-          Icons.warning,
-          color: Colors.black,
-        ),
-        messageText: Text(
-          "Barkod Zaten Kayıtlı",
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.black, fontSize: 20),
-        ),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 4),
-      ));
-    } else {
-      Get.showSnackbar(const GetSnackBar(
-        margin: EdgeInsets.only(bottom: 20),
-        borderRadius: 20,
-        borderColor: Color.fromARGB(255, 1, 53, 8),
-        icon: Icon(
-          Icons.done,
-          color: Colors.black,
-        ),
-        messageText: Text(
-          "Barkod Kayıtlı Değil",
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.black, fontSize: 20),
-        ),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 4),
-      ));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Boş alana tıklanınca klavyeyi kapat
+        // Boş Bırakılamaz alana tıklanınca klavyeyi kapat
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
@@ -143,21 +69,20 @@ class UrunEklePage extends StatelessWidget {
                   bool kontrol = true;
                   for (var urun in urunListe) {
                     if (urun.urun_barkod == tarananBarkod) {
-                      barkodKontrolSnack(true);
+                      EkranUyari().snackCikti(true, "Bu Barkod Zaten Kayıtlı.");
                       kontrol = false;
                       break;
                     }
                   }
                   if (kontrol) {
-                    barkodKontrolSnack(false);
+                    EkranUyari().snackCikti(
+                        false, "Bu Barkodda Ürün Yok Devam Edebilirsiniz.");
                     tfBarkod.text = tarananBarkod;
                   }
                 } else {
                   Get.offAll(BotNavBar());
                 }
               }
-
-              tfUrunKurus.text = "00";
 
               return Padding(
                 padding: const EdgeInsets.only(left: 20.0, right: 20),
@@ -231,27 +156,34 @@ class UrunEklePage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          "Barkodsuz Kayıt İçin Sürükleyin",
-                          style: TextStyle(color: Color(yaziColor)),
-                        ),
-                        Obx(
-                          () => Switch(
-                            value: boolcuk.value,
-                            activeColor: const Color.fromARGB(255, 0, 70, 3),
-                            inactiveThumbColor:
-                                const Color.fromARGB(255, 129, 10, 2),
-                            inactiveTrackColor: Colors.redAccent,
-                            onChanged: (value) {
-                              boolcuk.value = value;
-                            },
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(butonColor), width: 5),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            "Barkodsuz Kayıt İçin Sürükleyin",
+                            style: TextStyle(color: Color(yaziColor)),
                           ),
-                        ),
-                      ],
+                          Obx(
+                            () => Switch(
+                              value: boolcuk.value,
+                              activeColor: const Color.fromARGB(255, 0, 70, 3),
+                              inactiveThumbColor:
+                                  const Color.fromARGB(255, 129, 10, 2),
+                              inactiveTrackColor: Colors.redAccent,
+                              onChanged: (value) {
+                                boolcuk.value = value;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           flex: 5,
@@ -269,74 +201,121 @@ class UrunEklePage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                            height:
-                                5), // Optional: Açıklama için boşluk eklendi
                         Expanded(
                           flex: 2,
-                          child: TextField(
+                          child: TextFormField(
                             controller: tfUrunAdet,
                             keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Boş Bırakılamaz';
+                              }
+                              return null;
+                            },
                             decoration: InputDecoration(
                               hintText: "Adet",
                               border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(25.0),
-                                  borderSide:
-                                      BorderSide(color: Color(butonColor))),
+                                borderRadius: BorderRadius.circular(25.0),
+                                borderSide:
+                                    BorderSide(color: Color(butonColor)),
+                              ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(color: Color(yaziColor)),
                               ),
+                              errorBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red),
+                              ),
+                              errorText: tfUrunAdet.text.isEmpty ? 'Boş' : null,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: tfUrunFiyat,
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
-                            decoration: InputDecoration(
-                              hintText: "Ürün Fiyatını Gir",
-                              helperText: "Tam Kısmı Buraya Girin",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(25.0),
-                                borderSide:
-                                    BorderSide(color: Color(butonColor)),
+                    Form(
+                      autovalidateMode: AutovalidateMode.always,
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: tfUrunFiyat,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Boş Bırakılamaz';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: "Ürün Fiyatını Gir",
+                                    helperText: "Tam Kısmı Buraya Girin",
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(25.0),
+                                      borderSide:
+                                          BorderSide(color: Color(butonColor)),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Color(yaziColor)),
+                                    ),
+                                    errorBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.red),
+                                    ),
+                                    errorText: tfUrunFiyat.text.isEmpty
+                                        ? 'Boş Bırakılamaz'
+                                        : null,
+                                  ),
+                                ),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(yaziColor)),
+                              const SizedBox(width: 4),
+                              const Text("."),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: tfUrunKurus,
+                                  maxLength: 2,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Boş Bırakılamaz';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: "Kuruş Giriniz",
+                                    helperText: "Kuruş",
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(25.0),
+                                      borderSide:
+                                          BorderSide(color: Color(butonColor)),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Color(yaziColor)),
+                                    ),
+                                    errorBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.red),
+                                    ),
+                                    errorText: tfUrunKurus.text.isEmpty
+                                        ? 'Boş Bırakılamaz'
+                                        : null,
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text("."),
-                        const SizedBox(
-                            width: 4), // Add some spacing between text fields
-                        Expanded(
-                          child: TextField(
-                            controller: tfUrunKurus,
-                            maxLength: 2,
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
-                            decoration: InputDecoration(
-                              hintText: "Kuruş Giriniz",
-                              helperText: "Kuruş",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(25.0),
-                                borderSide:
-                                    BorderSide(color: Color(butonColor)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(yaziColor)),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
@@ -345,14 +324,14 @@ class UrunEklePage extends StatelessWidget {
                       onPressed: () {
                         if (boolcuk.value) {
                           tfBarkod.text = ".";
-                          urunKayit(
+                          UrunIslem().urunKayit(
                               tfBarkod.text,
                               tfUrunAd.text,
                               int.parse(tfUrunAdet.text),
                               int.parse(tfUrunFiyat.text),
                               int.parse(tfUrunKurus.text));
                         } else {
-                          urunKayit(
+                          UrunIslem().urunKayit(
                               tfBarkod.text,
                               tfUrunAd.text,
                               int.parse(tfUrunAdet.text),

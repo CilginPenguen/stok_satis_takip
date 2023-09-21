@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:stok_satis_takip/Controller/SnackController.dart';
 import 'package:stok_satis_takip/Cores/Urunler.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
 
@@ -15,69 +16,6 @@ class UrunlerSayfasi extends StatelessWidget {
     int yaziColor = Get.find<renkKontrol>().yazi.value;
 
     var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
-
-    Future<void> UrunSil(String urun_id) async {
-      refUrun.child(urun_id).remove();
-      Get.back();
-    }
-
-    Future<void> eminMisin(String urun_id, String urun_ad) async {
-      Get.dialog(AlertDialog(
-        backgroundColor: const Color.fromARGB(255, 55, 47, 47),
-        shadowColor: const Color.fromARGB(255, 42, 41, 41),
-        title: Text(
-          "$urun_ad silmek istiyor musunuz ?",
-          style: TextStyle(color: Color(yaziColor)),
-        ),
-        actionsAlignment: MainAxisAlignment.end,
-        actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                      width: 5.0,
-                      color: Color.fromARGB(255, 19, 102, 21),
-                    ),
-                  ),
-                  onPressed: () {
-                    UrunSil(urun_id);
-                  },
-                  icon: const Icon(
-                    Icons.delete_forever,
-                    color: Color.fromARGB(255, 19, 102, 21),
-                    size: 32,
-                  ),
-                  label: Text(
-                    "Evet",
-                    style: TextStyle(color: Color(yaziColor), fontSize: 21),
-                  )),
-              OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                      width: 5.0,
-                      color: Color.fromARGB(255, 152, 34, 26),
-                    ),
-                  ),
-                  onPressed: () {
-                    Get.back();
-                  },
-                  icon: const Icon(
-                    Icons.cancel_outlined,
-                    color: Color.fromARGB(255, 152, 34, 26),
-                    size: 32,
-                  ),
-                  label: Text(
-                    "Hayır",
-                    style: TextStyle(color: Color(yaziColor), fontSize: 21),
-                  )),
-            ],
-          )
-        ],
-      ));
-    }
-
     return Scaffold(
       backgroundColor: Color(backgColor),
       appBar: AppBar(
@@ -140,7 +78,11 @@ class UrunlerSayfasi extends StatelessWidget {
                               children: [
                                 IconButton(
                                   onPressed: () {
-                                    eminMisin(urunS.urun_id, urunS.urun_ad);
+                                    EkranUyari().eminMisin(
+                                        urun_id: urunS.urun_id,
+                                        mesaj:
+                                            "${urunS.urun_ad} silmek istediğine emin misin?",
+                                        referans: "Urunler");
                                   },
                                   icon: Icon(Icons.delete,
                                       color: Color(backgColor)),

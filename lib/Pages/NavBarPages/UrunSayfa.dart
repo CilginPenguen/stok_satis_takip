@@ -44,7 +44,17 @@ class UrunlerSayfasi extends StatelessWidget {
                   String fiyatText = "${urunS.urun_fiyat}.${urunS.urun_kurus}";
                   double tamFiyat = double.parse(fiyatText);
                   return GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      EkranUyari().urunGuncelle(
+                          mesaj: "${urunS.urun_ad} Güncelle",
+                          barkodVarMi: urunS.urun_barkod == "." ? false : true,
+                          barkod: urunS.urun_barkod,
+                          urun_ad: urunS.urun_ad,
+                          urun_adet: urunS.urun_adet,
+                          urun_fiyat: urunS.urun_fiyat,
+                          urun_kurus: urunS.urun_kurus,
+                          urun_id: urunS.urun_id);
+                    },
                     child: Card(
                       color: Color(butonColor),
                       child: Padding(

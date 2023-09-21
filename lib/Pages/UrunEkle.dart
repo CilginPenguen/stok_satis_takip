@@ -49,7 +49,7 @@ class UrunEklePage extends StatelessWidget {
             style: TextStyle(color: Color(yaziColor)),
           ),
         ),
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         body: StreamBuilder<DatabaseEvent>(
           stream: refUrun.onValue,
           builder: (context, event) {
@@ -84,70 +84,243 @@ class UrunEklePage extends StatelessWidget {
                 }
               }
 
-              return Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Obx(
-                      () => Visibility(
-                        visible: !boolcuk.value,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: tfBarkod,
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  hintText: "Barkod Alanı",
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(25.0),
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20.0, right: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Obx(
+                        () => Visibility(
+                          visible: !boolcuk.value,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: tfBarkod,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    hintText: "Barkod Alanı",
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                        borderSide: BorderSide(
+                                            color: Color(butonColor))),
+                                    focusedBorder: OutlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Color(butonColor))),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Color(yaziColor)),
+                                          BorderSide(color: Color(yaziColor)),
+                                    ),
                                   ),
                                 ),
                               ),
+                              const SizedBox(width: 10),
+                              Column(
+                                children: [
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(butonColor),
+                                    ),
+                                    onPressed: () {
+                                      barkodTara();
+                                      VibrationController()
+                                          .tip(titresimTip: "light");
+                                    },
+                                    icon: Icon(
+                                      Icons.barcode_reader,
+                                      color: Color(yaziColor),
+                                    ),
+                                    label: Text(
+                                      "Barkod Tara",
+                                      style: TextStyle(color: Color(yaziColor)),
+                                    ),
+                                  ),
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(butonColor),
+                                    ),
+                                    onPressed: () {
+                                      VibrationController()
+                                          .tip(titresimTip: "light");
+                                      tfBarkod.text = "";
+                                    },
+                                    icon: Icon(
+                                      Icons.cancel,
+                                      color: Color(yaziColor),
+                                    ),
+                                    label: Text(
+                                      "Temizle",
+                                      style: TextStyle(color: Color(yaziColor)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border:
+                              Border.all(color: Color(butonColor), width: 5),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              "Barkodsuz Kayıt İçin Sürükleyin",
+                              style: TextStyle(color: Color(yaziColor)),
                             ),
-                            const SizedBox(width: 10),
-                            Column(
+                            Obx(
+                              () => Switch(
+                                value: boolcuk.value,
+                                activeColor:
+                                    const Color.fromARGB(255, 0, 70, 3),
+                                inactiveThumbColor:
+                                    const Color.fromARGB(255, 129, 10, 2),
+                                inactiveTrackColor: Colors.redAccent,
+                                onChanged: (value) {
+                                  boolcuk.value = value;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 5,
+                            child: TextField(
+                              controller: tfUrunAd,
+                              decoration: InputDecoration(
+                                hintText: "Ürün Adını Gir",
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderSide:
+                                        BorderSide(color: Color(butonColor))),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Color(yaziColor)),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: TextFormField(
+                              controller: tfUrunAdet,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Boş Bırakılamaz';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                hintText: "Adet",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(25.0),
+                                  borderSide:
+                                      BorderSide(color: Color(butonColor)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Color(yaziColor)),
+                                ),
+                                errorBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red),
+                                ),
+                                errorText:
+                                    tfUrunAdet.text.isEmpty ? 'Boş' : null,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Form(
+                        autovalidateMode: AutovalidateMode.always,
+                        child: Column(
+                          children: [
+                            Row(
                               children: [
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(butonColor),
-                                  ),
-                                  onPressed: () {
-                                    barkodTara();
-                                    VibrationController()
-                                        .tip(titresimTip: "light");
-                                  },
-                                  icon: Icon(
-                                    Icons.barcode_reader,
-                                    color: Color(yaziColor),
-                                  ),
-                                  label: Text(
-                                    "Barkod Tara",
-                                    style: TextStyle(color: Color(yaziColor)),
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: tfUrunFiyat,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Boş Bırakılamaz';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: "Ürün Fiyatını Gir",
+                                      helperText: "Tam Kısmı Buraya Girin",
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                        borderSide: BorderSide(
+                                            color: Color(butonColor)),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Color(yaziColor)),
+                                      ),
+                                      errorBorder: const OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.red),
+                                      ),
+                                      errorText: tfUrunFiyat.text.isEmpty
+                                          ? 'Boş Bırakılamaz'
+                                          : null,
+                                    ),
                                   ),
                                 ),
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(butonColor),
-                                  ),
-                                  onPressed: () {
-                                    VibrationController()
-                                        .tip(titresimTip: "light");
-                                    tfBarkod.text = "";
-                                  },
-                                  icon: Icon(
-                                    Icons.cancel,
-                                    color: Color(yaziColor),
-                                  ),
-                                  label: Text(
-                                    "Temizle",
-                                    style: TextStyle(color: Color(yaziColor)),
+                                const SizedBox(width: 4),
+                                const Text("."),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: tfUrunKurus,
+                                    maxLength: 2,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Boş Bırakılamaz';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: "Kuruş Giriniz",
+                                      helperText: "Kuruş",
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                        borderSide: BorderSide(
+                                            color: Color(butonColor)),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Color(yaziColor)),
+                                      ),
+                                      errorBorder: const OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.red),
+                                      ),
+                                      errorText: tfUrunKurus.text.isEmpty
+                                          ? 'Boş Bırakılamaz'
+                                          : null,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -155,204 +328,43 @@ class UrunEklePage extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(butonColor), width: 5),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            "Barkodsuz Kayıt İçin Sürükleyin",
-                            style: TextStyle(color: Color(yaziColor)),
-                          ),
-                          Obx(
-                            () => Switch(
-                              value: boolcuk.value,
-                              activeColor: const Color.fromARGB(255, 0, 70, 3),
-                              inactiveThumbColor:
-                                  const Color.fromARGB(255, 129, 10, 2),
-                              inactiveTrackColor: Colors.redAccent,
-                              onChanged: (value) {
-                                boolcuk.value = value;
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 5,
-                          child: TextField(
-                            controller: tfUrunAd,
-                            decoration: InputDecoration(
-                              hintText: "Ürün Adını Gir",
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(25.0),
-                                  borderSide:
-                                      BorderSide(color: Color(butonColor))),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(yaziColor)),
-                              ),
-                            ),
-                          ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(butonColor),
                         ),
-                        Expanded(
-                          flex: 2,
-                          child: TextFormField(
-                            controller: tfUrunAdet,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Boş Bırakılamaz';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              hintText: "Adet",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(25.0),
-                                borderSide:
-                                    BorderSide(color: Color(butonColor)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(yaziColor)),
-                              ),
-                              errorBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                              ),
-                              errorText: tfUrunAdet.text.isEmpty ? 'Boş' : null,
-                            ),
-                          ),
+                        onPressed: () {
+                          if (boolcuk.value) {
+                            tfBarkod.text = ".";
+                            UrunIslem().urunKayit(
+                                tfBarkod.text,
+                                tfUrunAd.text,
+                                int.parse(tfUrunAdet.text),
+                                int.parse(tfUrunFiyat.text),
+                                int.parse(tfUrunKurus.text));
+                          } else {
+                            UrunIslem().urunKayit(
+                                tfBarkod.text,
+                                tfUrunAd.text,
+                                int.parse(tfUrunAdet.text),
+                                int.parse(tfUrunFiyat.text),
+                                int.parse(tfUrunKurus.text));
+                          }
+                        },
+                        icon: Icon(
+                          Icons.save,
+                          color: Color(yaziColor),
                         ),
-                      ],
-                    ),
-                    Form(
-                      autovalidateMode: AutovalidateMode.always,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: tfUrunFiyat,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Boş Bırakılamaz';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: "Ürün Fiyatını Gir",
-                                    helperText: "Tam Kısmı Buraya Girin",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(25.0),
-                                      borderSide:
-                                          BorderSide(color: Color(butonColor)),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Color(yaziColor)),
-                                    ),
-                                    errorBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.red),
-                                    ),
-                                    errorText: tfUrunFiyat.text.isEmpty
-                                        ? 'Boş Bırakılamaz'
-                                        : null,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Text("."),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: TextFormField(
-                                  controller: tfUrunKurus,
-                                  maxLength: 2,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Boş Bırakılamaz';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: "Kuruş Giriniz",
-                                    helperText: "Kuruş",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(25.0),
-                                      borderSide:
-                                          BorderSide(color: Color(butonColor)),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Color(yaziColor)),
-                                    ),
-                                    errorBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.red),
-                                    ),
-                                    errorText: tfUrunKurus.text.isEmpty
-                                        ? 'Boş Bırakılamaz'
-                                        : null,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                        label: Text(
+                          "Kaydet",
+                          style: TextStyle(color: Color(yaziColor)),
+                        ),
                       ),
-                    ),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(butonColor),
+                      SizedBox(
+                        //bunu unutma ya hayat kurtarıyo :))
+                        height: MediaQuery.of(context).viewInsets.bottom,
                       ),
-                      onPressed: () {
-                        if (boolcuk.value) {
-                          tfBarkod.text = ".";
-                          UrunIslem().urunKayit(
-                              tfBarkod.text,
-                              tfUrunAd.text,
-                              int.parse(tfUrunAdet.text),
-                              int.parse(tfUrunFiyat.text),
-                              int.parse(tfUrunKurus.text));
-                        } else {
-                          UrunIslem().urunKayit(
-                              tfBarkod.text,
-                              tfUrunAd.text,
-                              int.parse(tfUrunAdet.text),
-                              int.parse(tfUrunFiyat.text),
-                              int.parse(tfUrunKurus.text));
-                        }
-                      },
-                      icon: Icon(
-                        Icons.save,
-                        color: Color(yaziColor),
-                      ),
-                      label: Text(
-                        "Kaydet",
-                        style: TextStyle(color: Color(yaziColor)),
-                      ),
-                    ),
-                    SizedBox(
-                      //bunu unutma ya hayat kurtarıyo :))
-                      height: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             } else {

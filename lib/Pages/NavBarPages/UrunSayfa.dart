@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stok_satis_takip/Controller/SnackController.dart';
@@ -36,6 +37,9 @@ class UrunlerSayfasi extends StatelessWidget {
                 var gelenUrun = Urunler.fromJson(key, nesne);
                 urunListe.add(gelenUrun);
               });
+            }
+            if (kDebugMode) {
+              print(urunListe[0].urun_ad);
             }
             return ListView.builder(
                 itemCount: urunListe.length,

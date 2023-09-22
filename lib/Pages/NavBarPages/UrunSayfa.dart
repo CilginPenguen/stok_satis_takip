@@ -1,5 +1,4 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stok_satis_takip/Controller/SnackController.dart';
@@ -29,7 +28,13 @@ class UrunlerSayfasi extends StatelessWidget {
       body: StreamBuilder<DatabaseEvent>(
         stream: refUrun.onValue,
         builder: (context, event) {
-          if (event.hasData) {
+          if (event.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (event.hasError) {
+            return Center(child: Text('Error: ${event.error}'));
+          } else if (!event.hasData || event.data?.snapshot.value == null) {
+            return Center(child: Text('No data available'));
+          } else {
             var urunListe = <Urunler>[];
             var gelenUrunler = event.data!.snapshot.value as dynamic;
             if (gelenUrunler != null) {
@@ -38,9 +43,7 @@ class UrunlerSayfasi extends StatelessWidget {
                 urunListe.add(gelenUrun);
               });
             }
-            if (kDebugMode) {
-              print(urunListe[0].urun_ad);
-            }
+
             return ListView.builder(
                 itemCount: urunListe.length,
                 itemBuilder: (context, i) {
@@ -109,21 +112,6 @@ class UrunlerSayfasi extends StatelessWidget {
                     ),
                   );
                 });
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  "Urunler",
-                  style: TextStyle(color: Color(yaziColor)),
-                ),
-              ),
-              body: Center(
-                child: Text(
-                  "Urun Bulunamadı",
-                  style: TextStyle(color: Color(yaziColor)),
-                ),
-              ),
-            );
           }
         },
       ),

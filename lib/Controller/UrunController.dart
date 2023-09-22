@@ -37,7 +37,6 @@ class UrunIslem extends GetxController {
       urun["urun_adet"] = urun_adet;
       urun["urun_fiyat"] = urun_fiyat;
       urun["urun_kurus"] = urun_kurus;
-      urun["sepet_adet"] = 1;
       await refUrun.push().set(urun);
       Get.offAllNamed("/");
 
@@ -92,7 +91,6 @@ class UrunIslem extends GetxController {
       urun["urun_adet"] = urun_adet;
       urun["urun_fiyat"] = urun_fiyat;
       urun["urun_kurus"] = urun_kurus;
-      urun["sepet_adet"] = 1;
       await refUrun.child(urun_id).update(urun);
       VibrationController().tip(titresimTip: "success");
 

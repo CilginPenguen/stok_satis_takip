@@ -87,6 +87,7 @@ class AnaSayfa extends StatelessWidget {
                         backgroundColor: Color(butonColor)),
                     onPressed: () {
                       VibrationController().tip(titresimTip: "light");
+                      Get.toNamed("/Sepet");
                     },
                     icon: Icon(
                       Icons.shopping_cart,

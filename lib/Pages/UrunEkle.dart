@@ -1,4 +1,5 @@
-// ignore_for_file: must_be_immutable
+// ignore: file_names
+// ignore_for_file: must_be_immutable, file_names, duplicate_ignore
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,13 @@ class UrunEklePage extends StatelessWidget {
       body: StreamBuilder<DatabaseEvent>(
         stream: refUrun.onValue,
         builder: (context, event) {
-          if (event.hasData) {
+          if (event.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (event.hasError) {
+            return Center(child: Text('Error: ${event.error}'));
+          } else if (!event.hasData || event.data?.snapshot.value == null) {
+            return const Center(child: Text('No data available'));
+          } else {
             var urunListe = <Urunler>[];
             var gelenUrunler = event.data!.snapshot.value as dynamic;
             if (gelenUrunler != null) {
@@ -363,10 +370,6 @@ class UrunEklePage extends StatelessWidget {
                   ),
                 ],
               ),
-            );
-          } else {
-            return const Center(
-              child: Text("İnternet Bağlantınızı Kontrol Edin"),
             );
           }
         },

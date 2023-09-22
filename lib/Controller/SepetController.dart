@@ -26,11 +26,25 @@ class SepetController extends GetxController {
 
     sepetListesi.add(urun);
     update();
-    print(sepetListesi.isEmpty);
-    for (var a in sepetListesi) {
-      print(a.sepet_ad);
-      print(a.sepet_adet);
-      print(a.sepet_id);
+  }
+
+  void arttirSepetAdet(String sepetId) {
+    final sepet = sepetListesi.firstWhere((item) => item.sepet_id == sepetId);
+
+    if (sepet != null) {
+      sepet.sepet_adet++;
+      sepetListesi.refresh();
+      update(); // Değişikliği güncelle
+    }
+  }
+
+  void azaltSepetAdet(String sepetId) {
+    final sepet = sepetListesi.firstWhere((item) => item.sepet_id == sepetId);
+
+    if (sepet != null) {
+      sepet.sepet_adet--;
+      sepetListesi.refresh();
+      update(); // Değişikliği güncelle
     }
   }
 }

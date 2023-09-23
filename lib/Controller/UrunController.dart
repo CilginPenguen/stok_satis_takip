@@ -6,8 +6,8 @@ import 'package:stok_satis_takip/Controller/SnackController.dart';
 import 'package:stok_satis_takip/Controller/VibrationController.dart';
 
 class UrunIslem extends GetxController {
-  Future<void> urunKayit(String urun_barkod, String urun_ad, int urun_adet,
-      int urun_fiyat, int urun_kurus) async {
+  Future<void> urunKayit(
+      String urun_barkod, String urun_ad, int urun_adet, num urun_fiyat) async {
     try {
       var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
       if (urun_barkod.isEmpty) {
@@ -26,17 +26,12 @@ class UrunIslem extends GetxController {
         EkranUyari().snackCikti(true, "Ürün Fiyatı 0 dan Küçük Olamaz");
         return;
       }
-      if (urun_kurus < 0 || urun_kurus > 99) {
-        EkranUyari().snackCikti(true, "Kuruş 0 ile 99 Aralığında Olmalı.");
-        return;
-      }
 
       var urun = HashMap<String, dynamic>();
       urun["urun_barkod"] = urun_barkod;
       urun["urun_ad"] = urun_ad;
       urun["urun_adet"] = urun_adet;
       urun["urun_fiyat"] = urun_fiyat;
-      urun["urun_kurus"] = urun_kurus;
       await refUrun.push().set(urun);
       Get.offAllNamed("/");
 
@@ -48,10 +43,17 @@ class UrunIslem extends GetxController {
   }
 
   Future<void> UrunSil(
-      {required String urun_id, required String referans}) async {
-    var ref = FirebaseDatabase.instance.ref().child(referans);
-    ref.child(urun_id).remove();
-    Get.back();
+      //genel olarak kullanılabilir bir sil işlemi, kod tekrarı olmaması adına geçmiş silme işlemi burda da yapılabilir.
+      {required String urun_id,
+      required String referans}) async {
+    try {
+      var ref = FirebaseDatabase.instance.ref().child(referans);
+      ref.child(urun_id).remove();
+      Get.back(canPop: true);
+      EkranUyari().snackCikti(false, "İşlem Başarıyla Gerçekleşti");
+    } on Exception catch (e) {
+      EkranUyari().snackCikti(true, "Hata: İşlem Gerçekleştirilemedi");
+    }
   }
 
   Future<void> urunGuncelle({
@@ -59,8 +61,7 @@ class UrunIslem extends GetxController {
     required String urun_id,
     required String urun_ad,
     required int urun_adet,
-    required int urun_fiyat,
-    required int urun_kurus,
+    required num urun_fiyat,
   }) async {
     try {
       var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
@@ -80,17 +81,12 @@ class UrunIslem extends GetxController {
         EkranUyari().snackCikti(true, "Ürün Fiyatı 0 dan Küçük Olamaz");
         return;
       }
-      if (urun_kurus < 0 || urun_kurus > 99) {
-        EkranUyari().snackCikti(true, "Kuruş 0 ile 99 Aralığında Olmalı.");
-        return;
-      }
 
       var urun = HashMap<String, dynamic>();
       urun["urun_barkod"] = urun_barkod;
       urun["urun_ad"] = urun_ad;
       urun["urun_adet"] = urun_adet;
       urun["urun_fiyat"] = urun_fiyat;
-      urun["urun_kurus"] = urun_kurus;
       await refUrun.child(urun_id).update(urun);
       VibrationController().tip(titresimTip: "success");
 

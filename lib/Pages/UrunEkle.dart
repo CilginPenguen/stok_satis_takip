@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
+import 'package:stok_satis_takip/Controller/BarcodeController.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
 import 'package:stok_satis_takip/Controller/SnackController.dart';
 import 'package:stok_satis_takip/Controller/UrunController.dart';
@@ -30,7 +31,6 @@ class UrunEklePage extends StatelessWidget {
   var tfUrunAd = TextEditingController();
   var tfUrunAdet = TextEditingController();
   var tfUrunFiyat = TextEditingController();
-  var tfUrunKurus = TextEditingController();
 
   var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
 
@@ -64,27 +64,6 @@ class UrunEklePage extends StatelessWidget {
                 urunListe.add(gelenUrun);
               });
             }
-            Future<void> barkodTara() async {
-              String tarananBarkod = await FlutterBarcodeScanner.scanBarcode(
-                  '#ff6666', 'Cancel', true, ScanMode.BARCODE);
-              if (tarananBarkod != '-1') {
-                bool kontrol = true;
-                for (var urun in urunListe) {
-                  if (urun.urun_barkod == tarananBarkod) {
-                    EkranUyari().snackCikti(true, "Bu Barkod Zaten Kayıtlı.");
-                    kontrol = false;
-                    break;
-                  }
-                }
-                if (kontrol) {
-                  EkranUyari().snackCikti(
-                      false, "Bu Barkodda Ürün Yok Devam Edebilirsiniz.");
-                  tfBarkod.text = tarananBarkod;
-                }
-              } else {
-                Get.offAll(BotNavBar());
-              }
-            }
 
             return Padding(
               padding: const EdgeInsets.only(left: 20.0, right: 20),
@@ -105,6 +84,7 @@ class UrunEklePage extends StatelessWidget {
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
                                 hintText: "Barkod Alanı",
+                                helperText: "Barkod",
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(25.0),
                                     borderSide:
@@ -123,8 +103,9 @@ class UrunEklePage extends StatelessWidget {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Color(butonColor),
                                 ),
-                                onPressed: () {
-                                  barkodTara();
+                                onPressed: () async {
+                                  tfBarkod.text = await BarcodeController()
+                                      .barkodTara(urunListe: urunListe);
                                   VibrationController()
                                       .tip(titresimTip: "light");
                                 },
@@ -142,6 +123,8 @@ class UrunEklePage extends StatelessWidget {
                                   backgroundColor: Color(butonColor),
                                 ),
                                 onPressed: () {
+                                  EkranUyari()
+                                      .snackCikti(false, "Barkod Temizlendi");
                                   VibrationController()
                                       .tip(titresimTip: "light");
                                   tfBarkod.text = "";
@@ -198,7 +181,8 @@ class UrunEklePage extends StatelessWidget {
                             FocusManager.instance.primaryFocus?.unfocus();
                           },
                           decoration: InputDecoration(
-                            hintText: "Ürün Adını Gir",
+                            hintText: "Ürün Adını Giriniz",
+                            helperText: "Ürün Adı",
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(25.0),
                                 borderSide:
@@ -256,9 +240,12 @@ class UrunEklePage extends StatelessWidget {
                                 onTapOutside: (event) {
                                   FocusManager.instance.primaryFocus?.unfocus();
                                 },
-                                keyboardType: TextInputType.number,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
                                 inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'[0-9.,]')),
                                 ],
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -266,9 +253,24 @@ class UrunEklePage extends StatelessWidget {
                                   }
                                   return null;
                                 },
+                                onChanged: (value) {
+                                  // Her değişiklikte kontrol ve düzenleme yap
+                                  String newValue = value.replaceAll(',', '.');
+                                  if (newValue.contains('.') &&
+                                      newValue.split('.')[1].length > 2) {
+                                    // En fazla 2 ondalık basamağa izin ver
+                                    newValue = double.parse(newValue)
+                                        .toStringAsFixed(2);
+                                  }
+                                  tfUrunFiyat.value = TextEditingValue(
+                                    text: newValue,
+                                    selection: TextSelection.collapsed(
+                                        offset: newValue.length),
+                                  );
+                                },
                                 decoration: InputDecoration(
-                                  hintText: "Ürün Fiyatını Gir",
-                                  helperText: "Tam Kısmı Buraya Girin",
+                                  hintText: "Ürün Fiyatını Giriniz.",
+                                  helperText: "Ürün Fiyatı",
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(25.0),
                                     borderSide:
@@ -287,47 +289,6 @@ class UrunEklePage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 4),
-                            const Text("."),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: TextFormField(
-                                controller: tfUrunKurus,
-                                onTapOutside: (event) {
-                                  FocusManager.instance.primaryFocus?.unfocus();
-                                },
-                                maxLength: 2,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Boş Bırakılamaz';
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                  hintText: "Kuruş Giriniz",
-                                  helperText: "Kuruş",
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
-                                    borderSide:
-                                        BorderSide(color: Color(butonColor)),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Color(yaziColor)),
-                                  ),
-                                  errorBorder: const OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.red),
-                                  ),
-                                  errorText: tfUrunKurus.text.isEmpty
-                                      ? 'Boş Bırakılamaz'
-                                      : null,
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ],
@@ -337,22 +298,28 @@ class UrunEklePage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(butonColor),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (boolcuk.value) {
                         tfBarkod.text = ".";
                         UrunIslem().urunKayit(
-                            tfBarkod.text,
-                            tfUrunAd.text,
-                            int.parse(tfUrunAdet.text),
-                            int.parse(tfUrunFiyat.text),
-                            int.parse(tfUrunKurus.text));
+                          tfBarkod.text,
+                          tfUrunAd.text,
+                          int.parse(tfUrunAdet.text),
+                          num.parse(tfUrunFiyat.text),
+                        );
                       } else {
-                        UrunIslem().urunKayit(
+                        bool kayitKontrol = await BarcodeController()
+                            .barkodKontrol(urunListe, tfBarkod.text);
+                        if (kayitKontrol) {
+                          EkranUyari().snackCikti(true, "Barkod Zaten Kayıtlı");
+                        } else {
+                          UrunIslem().urunKayit(
                             tfBarkod.text,
                             tfUrunAd.text,
                             int.parse(tfUrunAdet.text),
-                            int.parse(tfUrunFiyat.text),
-                            int.parse(tfUrunKurus.text));
+                            num.parse(tfUrunFiyat.text),
+                          );
+                        }
                       }
                     },
                     icon: Icon(

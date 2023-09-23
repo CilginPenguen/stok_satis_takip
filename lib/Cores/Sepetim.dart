@@ -2,8 +2,7 @@ class Sepetim {
   String sepet_id;
   String sepet_ad;
   int stok_adet;
-  int urun_fiyat;
-  int urun_kurus;
+  num urun_fiyat;
   int sepet_adet;
 
   Sepetim(
@@ -11,6 +10,5 @@ class Sepetim {
       required this.sepet_ad,
       required this.stok_adet,
       required this.urun_fiyat,
-      required this.urun_kurus,
       required this.sepet_adet});
 }

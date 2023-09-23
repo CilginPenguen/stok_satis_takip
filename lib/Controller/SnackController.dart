@@ -51,7 +51,7 @@ class EkranUyari extends GetxController {
     }
   }
 
-  Future<void> eminMisin(
+  Future<void> SilEminMisin(
       {required String urun_id,
       required String mesaj,
       required String referans}) async {
@@ -121,20 +121,17 @@ class EkranUyari extends GetxController {
     required String urun_id,
     required String urun_ad,
     required int urun_adet,
-    required int urun_fiyat,
-    required int urun_kurus,
+    required num urun_fiyat,
   }) async {
     var tfBarkod = TextEditingController();
     var tfUrunAd = TextEditingController();
     var tfUrunAdet = TextEditingController();
     var tfUrunFiyat = TextEditingController();
-    var tfUrunKurus = TextEditingController();
 
     tfBarkod.text = barkod;
     tfUrunAd.text = urun_ad;
     tfUrunAdet.text = urun_adet.toString();
     tfUrunFiyat.text = urun_fiyat.toString();
-    tfUrunKurus.text = urun_kurus.toString();
 
     Get.dialog(
       barrierDismissible: false,
@@ -261,46 +258,6 @@ class EkranUyari extends GetxController {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const Text("."),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: TextFormField(
-                      //urun kuruş alanı
-                      controller: tfUrunKurus,
-                      style: const TextStyle(color: Colors.white),
-                      onTapOutside: (event) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                      },
-                      maxLength: 2,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Boş Bırakılamaz';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        hintText: "Kuruş Giriniz",
-                        helperText: "Kuruş Kısmı",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                          borderSide: BorderSide(color: Color(butonColor)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(yaziColor)),
-                        ),
-                        errorBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red),
-                        ),
-                        errorText:
-                            tfUrunKurus.text.isEmpty ? 'Boş Bırakılamaz' : null,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ],
@@ -322,8 +279,7 @@ class EkranUyari extends GetxController {
                       urun_id: urun_id,
                       urun_ad: tfUrunAd.text,
                       urun_adet: int.parse(tfUrunAdet.text),
-                      urun_fiyat: int.parse(tfUrunFiyat.text),
-                      urun_kurus: int.parse(tfUrunKurus.text));
+                      urun_fiyat: num.parse(tfUrunFiyat.text));
                 },
                 icon: const Icon(
                   Icons.cloud,

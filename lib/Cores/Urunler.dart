@@ -3,8 +3,7 @@ class Urunler {
   String urun_barkod;
   String urun_ad;
   int urun_adet;
-  int urun_fiyat;
-  int urun_kurus;
+  num urun_fiyat;
 
   Urunler(
     this.urun_id,
@@ -12,7 +11,6 @@ class Urunler {
     this.urun_ad,
     this.urun_adet,
     this.urun_fiyat,
-    this.urun_kurus,
   );
 
   factory Urunler.fromJson(String key, Map<dynamic, dynamic> json) {
@@ -21,8 +19,7 @@ class Urunler {
       json["urun_barkod"] as String,
       json["urun_ad"] as String,
       json["urun_adet"] as int,
-      json["urun_fiyat"] as int,
-      json["urun_kurus"] as int,
+      json["urun_fiyat"] as num,
     );
   }
 }

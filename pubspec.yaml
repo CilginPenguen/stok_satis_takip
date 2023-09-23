@@ -37,6 +37,7 @@ dependencies:
   flutter_colorpicker:
   flutter_barcode_scanner: ^2.0.0
   haptic_feedback:
+  intl:
 
 
   # The following adds the Cupertino Icons font to your application.

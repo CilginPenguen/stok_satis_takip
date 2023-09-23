@@ -1,13 +1,19 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
 import 'package:stok_satis_takip/Controller/SepetController.dart';
+import 'package:stok_satis_takip/Controller/VibrationController.dart';
 import 'package:stok_satis_takip/Cores/Urunler.dart';
+import 'package:intl/intl.dart';
 
 class SepetSayfa extends StatelessWidget {
   SepetSayfa({Key? key}) : super(key: key);
   final sepetCont = Get.put(SepetController());
+  DateTime anlikTarih = DateTime.now();
+  DateFormat tarihFormati = DateFormat("yyyy-MM-dd");
 
   int backgColor = Get.find<renkKontrol>().backbg.value;
   int barColor = Get.find<renkKontrol>().barBg.value;
@@ -16,7 +22,7 @@ class SepetSayfa extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double urunToplamFiyat = 0.0;
+    num urunToplamFiyat = 0.0;
 
     var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
 
@@ -31,16 +37,18 @@ class SepetSayfa extends StatelessWidget {
         ),
         actions: [
           OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(backgroundColor: Color(yaziColor)),
             onPressed: () {
               Get.toNamed("/SepetEkle");
+              VibrationController().tip(titresimTip: "light");
             },
             icon: Icon(
               Icons.add_circle,
-              color: Color(yaziColor),
+              color: Color(barColor),
             ),
             label: Text(
               "Ürün Ekle",
-              style: TextStyle(color: Color(yaziColor)),
+              style: TextStyle(color: Color(barColor)),
             ),
           ),
         ],
@@ -73,10 +81,7 @@ class SepetSayfa extends StatelessWidget {
                         itemBuilder: (context, i) {
                           var sepet = controller.sepetListesi[i];
 
-                          String fiyatText =
-                              "${sepet.urun_fiyat}.${sepet.urun_kurus}";
-                          double tamFiyat = double.parse(fiyatText);
-                          urunToplamFiyat = tamFiyat * sepet.sepet_adet;
+                          urunToplamFiyat = sepet.urun_fiyat * sepet.sepet_adet;
                           String kusurSil = urunToplamFiyat.toStringAsFixed(2);
                           urunToplamFiyat = double.parse(kusurSil);
 
@@ -87,7 +92,7 @@ class SepetSayfa extends StatelessWidget {
                           }
                           if (sepet.sepet_adet > sepet.stok_adet) {
                             int fark = sepet.sepet_adet - sepet.stok_adet;
-                            controller.toplamGuncelle(tamFiyat, fark);
+                            controller.toplamGuncelle(sepet.urun_fiyat, fark);
                             sepet.sepet_adet = sepet.stok_adet;
                           }
 
@@ -114,7 +119,7 @@ class SepetSayfa extends StatelessWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Birim Fiyatı: $tamFiyat\u{20BA}',
+                                              'Birim Fiyatı: ${sepet.urun_fiyat}\u{20BA}',
                                               style: TextStyle(
                                                   fontSize: 14,
                                                   color: Color(yaziColor)),
@@ -138,10 +143,12 @@ class SepetSayfa extends StatelessWidget {
                                           children: [
                                             IconButton(
                                               onPressed: () {
+                                                VibrationController()
+                                                    .tip(titresimTip: "light");
                                                 sepet.sepet_adet > 1
                                                     ? controller.azaltSepetAdet(
                                                         sepet.sepet_id,
-                                                        tamFiyat)
+                                                        sepet.urun_fiyat)
                                                     : null;
                                               },
                                               icon: const Icon(Icons.remove),
@@ -156,12 +163,14 @@ class SepetSayfa extends StatelessWidget {
                                             const SizedBox(width: 8),
                                             IconButton(
                                               onPressed: () {
+                                                VibrationController()
+                                                    .tip(titresimTip: "light");
                                                 (sepet.sepet_adet <
                                                         sepet.stok_adet)
                                                     ? controller
                                                         .arttirSepetAdet(
                                                             sepet.sepet_id,
-                                                            tamFiyat)
+                                                            sepet.urun_fiyat)
                                                     : null;
                                               },
                                               icon: const Icon(Icons.add),
@@ -185,8 +194,12 @@ class SepetSayfa extends StatelessWidget {
                                     children: [
                                       IconButton(
                                         onPressed: () {
-                                          controller.urunSil(sepet.sepet_id,
-                                              tamFiyat, sepet.sepet_adet);
+                                          VibrationController()
+                                              .tip(titresimTip: "cancel");
+                                          controller.urunSil(
+                                              sepet.sepet_id,
+                                              sepet.urun_fiyat,
+                                              sepet.sepet_adet);
                                         },
                                         icon: Icon(Icons.delete,
                                             color: Color(backgColor)),
@@ -240,7 +253,7 @@ class SepetSayfa extends StatelessWidget {
                                 color: Color(barColor),
                                 child: ElevatedButton.icon(
                                   onPressed: () {
-                                    // Alışverişi tamamla işlemlerini burada yapabilirsiniz
+                                    // Alışverişi tamamla işlemlerini burada yap
                                   },
                                   icon: Icon(
                                     Icons.done,

@@ -4,7 +4,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stok_satis_takip/Controller/SepetController.dart';
-import 'package:stok_satis_takip/Controller/SnackController.dart';
 import 'package:stok_satis_takip/Cores/Urunler.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
 
@@ -52,7 +51,7 @@ class SepetEkleSayfasi extends StatelessWidget {
                 itemCount: urunListe.length,
                 itemBuilder: (context, i) {
                   var urunS = urunListe[i];
-                  String fiyatText = "${urunS.urun_fiyat}.${urunS.urun_kurus}";
+                  String fiyatText = "${urunS.urun_fiyat}";
                   double tamFiyat = double.parse(fiyatText);
                   return Card(
                     color: Color(butonColor),
@@ -90,7 +89,6 @@ class SepetEkleSayfasi extends StatelessWidget {
                                       sepet_ad: urunS.urun_ad,
                                       stok_adet: urunS.urun_adet,
                                       urun_fiyat: urunS.urun_fiyat,
-                                      urun_kurus: urunS.urun_kurus,
                                       sepet_adet: 0);
                                 },
                                 icon: Icon(Icons.plus_one,

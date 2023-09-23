@@ -72,20 +72,24 @@ class SepetSayfa extends StatelessWidget {
                         itemCount: controller.sepetListesi.length,
                         itemBuilder: (context, i) {
                           var sepet = controller.sepetListesi[i];
-                          for (int a = 0; a < urunListe.length; a++) {
-                            if (sepet.sepet_id == urunListe[a].urun_id) {
-                              sepet.stok_adet = urunListe[a].urun_adet;
-                            }
-                          }
-                          if (sepet.sepet_adet > sepet.stok_adet) {
-                            sepet.sepet_adet = sepet.stok_adet;
-                          }
+
                           String fiyatText =
                               "${sepet.urun_fiyat}.${sepet.urun_kurus}";
                           double tamFiyat = double.parse(fiyatText);
                           urunToplamFiyat = tamFiyat * sepet.sepet_adet;
                           String kusurSil = urunToplamFiyat.toStringAsFixed(2);
                           urunToplamFiyat = double.parse(kusurSil);
+
+                          for (int a = 0; a < urunListe.length; a++) {
+                            if (sepet.sepet_id == urunListe[a].urun_id) {
+                              sepet.stok_adet = urunListe[a].urun_adet;
+                            }
+                          }
+                          if (sepet.sepet_adet > sepet.stok_adet) {
+                            int fark = sepet.sepet_adet - sepet.stok_adet;
+                            controller.toplamGuncelle(tamFiyat, fark);
+                            sepet.sepet_adet = sepet.stok_adet;
+                          }
 
                           return Card(
                             color: Color(butonColor),
@@ -181,7 +185,8 @@ class SepetSayfa extends StatelessWidget {
                                     children: [
                                       IconButton(
                                         onPressed: () {
-                                          // Sepeti silme ve toplamı güncelleme işlemlerini burada yapabilirsiniz
+                                          controller.urunSil(sepet.sepet_id,
+                                              tamFiyat, sepet.sepet_adet);
                                         },
                                         icon: Icon(Icons.delete,
                                             color: Color(backgColor)),

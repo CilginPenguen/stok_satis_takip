@@ -8,6 +8,7 @@ import 'package:stok_satis_takip/Controller/VibrationController.dart';
 
 class AnaSayfa extends StatelessWidget {
   final ClockController clockController = Get.put(ClockController());
+
   AnaSayfa({super.key});
 
   @override

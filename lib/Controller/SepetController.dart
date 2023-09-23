@@ -6,6 +6,8 @@ class SepetController extends GetxController {
   // RxList'i kullanarak dinlenebilir bir liste oluştur
   RxList<Sepetim> sepetListesi = <Sepetim>[].obs;
 
+  final toplamFiyat = 0.0.obs;
+
   // Sepete ürün ekleme metodu
   void sepeteUrunEkle({
     required String sepet_id,
@@ -28,22 +30,22 @@ class SepetController extends GetxController {
     update();
   }
 
-  void arttirSepetAdet(String sepetId) {
+  void arttirSepetAdet(String sepetId, double birimFiyat) {
     final sepet = sepetListesi.firstWhere((item) => item.sepet_id == sepetId);
 
-    if (sepet != null) {
+    if (sepet != null && sepet.sepet_adet < sepet.stok_adet) {
       sepet.sepet_adet++;
-      sepetListesi.refresh();
+      toplamFiyat.value += birimFiyat;
       update(); // Değişikliği güncelle
     }
   }
 
-  void azaltSepetAdet(String sepetId) {
+  void azaltSepetAdet(String sepetId, double birimFiyat) {
     final sepet = sepetListesi.firstWhere((item) => item.sepet_id == sepetId);
 
-    if (sepet != null) {
+    if (sepet != null && sepet.sepet_adet > 1) {
       sepet.sepet_adet--;
-      sepetListesi.refresh();
+      toplamFiyat.value -= birimFiyat;
       update(); // Değişikliği güncelle
     }
   }

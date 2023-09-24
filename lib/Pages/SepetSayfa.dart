@@ -253,7 +253,22 @@ class SepetSayfa extends StatelessWidget {
                                 color: Color(barColor),
                                 child: ElevatedButton.icon(
                                   onPressed: () {
-                                    // Alışverişi tamamla işlemlerini burada yap
+                                    for (var sepet in controller.sepetListesi) {
+                                      controller.gecmisEkle(
+                                          urun_id: sepet.sepet_id,
+                                          gecmis_ad: sepet.sepet_ad,
+                                          satis_adet: sepet.sepet_adet,
+                                          urun_fiyat: sepet.urun_fiyat,
+                                          urun_toplam: sepet.sepet_adet *
+                                              sepet.urun_fiyat,
+                                          tarih:
+                                              tarihFormati.format(anlikTarih));
+                                      controller.urunAdetGuncelle(
+                                          urun_adet: sepet.stok_adet -
+                                              sepet.sepet_adet,
+                                          urun_id: sepet.sepet_id);
+                                    }
+                                    Get.offAllNamed("/");
                                   },
                                   icon: Icon(
                                     Icons.done,

@@ -132,6 +132,7 @@ class AnaSayfa extends StatelessWidget {
                         backgroundColor: Color(butonColor)),
                     onPressed: () {
                       VibrationController().tip(titresimTip: "light");
+                      Get.toNamed("/Gecmis");
                     },
                     label: Text(
                       "Geçmiş ",

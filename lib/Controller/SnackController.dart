@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -51,10 +53,11 @@ class EkranUyari extends GetxController {
     }
   }
 
-  Future<void> SilEminMisin(
+  Future<bool> SilEminMisin(
       {required String urun_id,
       required String mesaj,
       required String referans}) async {
+    Completer<bool> completer = Completer<bool>();
     Get.dialog(AlertDialog(
       backgroundColor: const Color.fromARGB(255, 55, 47, 47),
       shadowColor: const Color.fromARGB(255, 42, 41, 41),
@@ -77,6 +80,7 @@ class EkranUyari extends GetxController {
                 onPressed: () {
                   UrunIslem().UrunSil(urun_id: urun_id, referans: referans);
                   VibrationController().tip(titresimTip: "success");
+                  completer.complete(true);
                 },
                 icon: const Icon(
                   Icons.delete_forever,
@@ -97,6 +101,7 @@ class EkranUyari extends GetxController {
                 onPressed: () {
                   Get.back();
                   VibrationController().tip(titresimTip: "cancel");
+                  completer.complete(false);
                 },
                 icon: const Icon(
                   Icons.cancel_outlined,
@@ -111,6 +116,7 @@ class EkranUyari extends GetxController {
         )
       ],
     ));
+    return completer.future;
   }
 
   //Ürün Güncelleme
@@ -224,15 +230,15 @@ class EkranUyari extends GetxController {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      //urun fiyat alanı
                       controller: tfUrunFiyat,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Color(yaziColor)),
                       onTapOutside: (event) {
                         FocusManager.instance.primaryFocus?.unfocus();
                       },
-                      keyboardType: TextInputType.number,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
                       ],
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -240,9 +246,23 @@ class EkranUyari extends GetxController {
                         }
                         return null;
                       },
+                      onChanged: (value) {
+                        // Her değişiklikte kontrol ve düzenleme yap
+                        String newValue = value.replaceAll(',', '.');
+                        if (newValue.contains('.') &&
+                            newValue.split('.')[1].length > 2) {
+                          // En fazla 2 ondalık basamağa izin ver
+                          newValue = double.parse(newValue).toStringAsFixed(2);
+                        }
+                        tfUrunFiyat.value = TextEditingValue(
+                          text: newValue,
+                          selection:
+                              TextSelection.collapsed(offset: newValue.length),
+                        );
+                      },
                       decoration: InputDecoration(
-                        hintText: "Ürün Fiyatını Gir",
-                        helperText: "Tam Kısım",
+                        hintText: "Ürün Fiyatını Giriniz.",
+                        helperText: "Ürün Fiyatı",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25.0),
                           borderSide: BorderSide(color: Color(butonColor)),

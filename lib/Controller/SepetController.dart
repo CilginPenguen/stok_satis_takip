@@ -44,7 +44,7 @@ class SepetController extends GetxController {
   void arttirSepetAdet(String sepetId, num birimFiyat) {
     final sepet = sepetListesi.firstWhere((item) => item.sepet_id == sepetId);
 
-    if (sepet != null && sepet.sepet_adet < sepet.stok_adet) {
+    if (sepet.sepet_adet < sepet.stok_adet) {
       sepet.sepet_adet++;
       toplamFiyat.value += birimFiyat;
       update();
@@ -54,7 +54,7 @@ class SepetController extends GetxController {
   void azaltSepetAdet(String sepet_id, num birimFiyat) {
     final sepet = sepetListesi.firstWhere((item) => item.sepet_id == sepet_id);
 
-    if (sepet != null && sepet.sepet_adet > 1) {
+    if (sepet.sepet_adet > 1) {
       sepet.sepet_adet--;
       toplamFiyat.value -= birimFiyat;
       update();
@@ -84,7 +84,21 @@ class SepetController extends GetxController {
     await refUrun.child(urun_id).update(urun);
   }
 
-  Future<void> gecmisEkle() async {
+  Future<void> gecmisEkle(
+      {required String urun_id,
+      required String gecmis_ad,
+      required int satis_adet,
+      required num urun_fiyat,
+      required num urun_toplam,
+      required String tarih}) async {
     var refGecmis = FirebaseDatabase.instance.ref().child("Gecmis");
+    var gecmis = HashMap<String, dynamic>();
+    gecmis["urun_id"] = urun_id;
+    gecmis["gecmis_ad"] = gecmis_ad;
+    gecmis["satis_adet"] = satis_adet;
+    gecmis["urun_fiyat"] = urun_fiyat;
+    gecmis["urun_toplam"] = urun_toplam;
+    gecmis["tarih"] = tarih;
+    await refGecmis.push().set(gecmis);
   }
 }

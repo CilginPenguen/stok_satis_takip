@@ -4,7 +4,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:stok_satis_takip/Controller/BarcodeController.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
@@ -12,7 +11,6 @@ import 'package:stok_satis_takip/Controller/SnackController.dart';
 import 'package:stok_satis_takip/Controller/UrunController.dart';
 import 'package:stok_satis_takip/Controller/VibrationController.dart';
 import 'package:stok_satis_takip/Cores/Urunler.dart';
-import 'package:stok_satis_takip/Pages/botnavbar.dart';
 
 class UrunEklePage extends StatelessWidget {
   UrunEklePage({
@@ -309,7 +307,7 @@ class UrunEklePage extends StatelessWidget {
                         );
                       } else {
                         bool kayitKontrol = await BarcodeController()
-                            .barkodKontrol(urunListe, tfBarkod.text);
+                            .varMi(urunListe, tfBarkod.text);
                         if (kayitKontrol) {
                           EkranUyari().snackCikti(true, "Barkod Zaten Kayıtlı");
                         } else {

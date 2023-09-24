@@ -8,7 +8,7 @@ class BarcodeController extends GetxController {
     String tarananBarkod = await FlutterBarcodeScanner.scanBarcode(
         '#ff6666', 'Cancel', true, ScanMode.BARCODE);
     if (tarananBarkod != '-1') {
-      bool durum = await barkodKontrol(urunListe, tarananBarkod);
+      bool durum = await varMi(urunListe, tarananBarkod);
       if (durum) {
         EkranUyari().snackCikti(true, "Bu Barkod Zaten Kayıtlı.");
         return "";
@@ -22,7 +22,7 @@ class BarcodeController extends GetxController {
     return "";
   }
 
-  Future<bool> barkodKontrol(List urunListe, String barkod) async {
+  Future<bool> varMi(List urunListe, String barkod) async {
     bool kontrol = false;
     for (var urun in urunListe) {
       if (urun.urun_barkod == barkod) {

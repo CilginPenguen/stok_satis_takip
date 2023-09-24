@@ -53,6 +53,7 @@ class UrunIslem extends GetxController {
       EkranUyari().snackCikti(false, "İşlem Başarıyla Gerçekleşti");
     } on Exception catch (e) {
       EkranUyari().snackCikti(true, "Hata: İşlem Gerçekleştirilemedi");
+      print(e);
     }
   }
 

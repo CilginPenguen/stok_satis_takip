@@ -1,32 +1,67 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:stok_satis_takip/Controller/ColorController.dart';
 import 'package:stok_satis_takip/Controller/SnackController.dart';
+import 'package:stok_satis_takip/Controller/StokController.dart';
 import 'package:stok_satis_takip/Controller/VibrationController.dart';
 import 'package:stok_satis_takip/Cores/Urunler.dart';
-import 'package:stok_satis_takip/Controller/ColorController.dart';
 
-class UrunlerSayfasi extends StatelessWidget {
-  const UrunlerSayfasi({super.key});
+class StokLimit extends StatelessWidget {
+  StokLimit({super.key});
+  var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
+  var tfLimit = TextEditingController();
+
+  int backgColor = Get.find<renkKontrol>().backbg.value;
+  int barColor = Get.find<renkKontrol>().barBg.value;
+  int butonColor = Get.find<renkKontrol>().buton.value;
+  int yaziColor = Get.find<renkKontrol>().yazi.value;
+  final stokLimit stokController = Get.put(stokLimit());
 
   @override
   Widget build(BuildContext context) {
-    int backgColor = Get.find<renkKontrol>().backbg.value;
-    int barColor = Get.find<renkKontrol>().barBg.value;
-    int butonColor = Get.find<renkKontrol>().buton.value;
-    int yaziColor = Get.find<renkKontrol>().yazi.value;
-
-    var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
+    tfLimit.text = (GetStorage().read("limit")).toString();
     return Scaffold(
       backgroundColor: Color(backgColor),
       appBar: AppBar(
         backgroundColor: Color(barColor),
         title: Text(
-          "Ürünler",
-          style: TextStyle(color: Color(yaziColor)),
+          "Stok Kontrol",
+          style: TextStyle(color: Color(yaziColor), fontSize: 16),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: SizedBox(
+              height: 40,
+              width: 75,
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Color(butonColor), width: 5)),
+                child: TextField(
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(color: Color(yaziColor)),
+                  controller: tfLimit,
+                  onTapOutside: (event) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                  onChanged: (value) {
+                    //int limit = int.parse(value);
+                    //VibrationController().tip(titresimTip: "light");
+                    //GetStorage().write("limit", limit);
+                    stokController.setLimit(int.parse(value));
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-      body: StreamBuilder<DatabaseEvent>(
+      body: StreamBuilder(
         stream: refUrun.onValue,
         builder: (context, event) {
           if (event.connectionState == ConnectionState.waiting) {
@@ -41,11 +76,13 @@ class UrunlerSayfasi extends StatelessWidget {
             if (gelenUrunler != null) {
               gelenUrunler.forEach((key, nesne) {
                 //print(nesne["urun_ad"].runtimeType); //bu önemli
-                var gelenUrun = Urunler.fromJson(key, nesne);
-                urunListe.add(gelenUrun);
+                int limit = GetStorage().read("limit");
+                if (limit >= nesne["urun_adet"]) {
+                  var gelenUrun = Urunler.fromJson(key, nesne);
+                  urunListe.add(gelenUrun);
+                }
               });
             }
-
             return ListView.builder(
               itemCount: urunListe.length,
               itemBuilder: (context, i) {
@@ -89,23 +126,6 @@ class UrunlerSayfasi extends StatelessWidget {
                                 ),
                               ],
                             ),
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  VibrationController()
-                                      .tip(titresimTip: "light");
-                                  EkranUyari().SilEminMisin(
-                                      urun_id: urunS.urun_id,
-                                      mesaj:
-                                          "${urunS.urun_ad} silmek istediğine emin misin?",
-                                      referans: "Urunler");
-                                },
-                                icon: Icon(Icons.delete,
-                                    color: Color(backgColor)),
-                              ),
-                            ],
                           ),
                         ],
                       ),

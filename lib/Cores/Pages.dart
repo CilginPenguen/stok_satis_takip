@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:stok_satis_takip/Pages/GecmisSayfa.dart';
 import 'package:stok_satis_takip/Pages/SepetEkle.dart';
 import 'package:stok_satis_takip/Pages/SepetSayfa.dart';
+import 'package:stok_satis_takip/Pages/StokLimit.dart';
 import 'package:stok_satis_takip/Pages/UrunEkle.dart';
 import 'package:stok_satis_takip/Pages/botnavbar.dart';
 
@@ -11,6 +12,7 @@ class Pages {
     GetPage(name: "/urunEkle", page: () => UrunEklePage()),
     GetPage(name: "/Sepet", page: () => SepetSayfa()),
     GetPage(name: "/SepetEkle", page: () => const SepetEkleSayfasi()),
-    GetPage(name: "/Gecmis", page: () => GecmisSayfa())
+    GetPage(name: "/Gecmis", page: () => GecmisSayfa()),
+    GetPage(name: "/StokSayfa", page: () => StokLimit()),
   ];
 }

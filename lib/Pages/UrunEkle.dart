@@ -252,11 +252,9 @@ class UrunEklePage extends StatelessWidget {
                                   return null;
                                 },
                                 onChanged: (value) {
-                                  // Her değişiklikte kontrol ve düzenleme yap
                                   String newValue = value.replaceAll(',', '.');
                                   if (newValue.contains('.') &&
                                       newValue.split('.')[1].length > 2) {
-                                    // En fazla 2 ondalık basamağa izin ver
                                     newValue = double.parse(newValue)
                                         .toStringAsFixed(2);
                                   }

@@ -113,132 +113,130 @@ class GecmisSayfa extends StatelessWidget {
                                 totalCiro.value += gelenGecmis.urun_toplam;
                               }
                             });
+                          }
 
-                            return ListView.builder(
-                              itemCount: gecmisListe.length,
-                              itemBuilder: (context, i) {
-                                var gecmis = gecmisListe[i];
-                                return GestureDetector(
-                                  onTap: () {},
-                                  child: Card(
-                                    color: Color(butonColor),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  gecmis.gecmis_ad,
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Color(yaziColor)),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      'Birim Fiyatı: ${gecmis.urun_fiyat}\u{20BA}',
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          color:
-                                                              Color(yaziColor)),
-                                                    ),
-                                                    Text(
-                                                      "Fiyat : ${gecmis.urun_toplam} \u{20BA}",
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          color:
-                                                              Color(yaziColor)),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 15.0),
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    const SizedBox(width: 8),
-                                                    Text(
-                                                      "Adet: ${gecmis.satis_adet}",
-                                                      style: TextStyle(
-                                                          color:
-                                                              Color(yaziColor)),
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Row(
+                          return ListView.builder(
+                            itemCount: gecmisListe.length,
+                            itemBuilder: (context, i) {
+                              var gecmis = gecmisListe[i];
+                              return GestureDetector(
+                                onTap: () {},
+                                child: Card(
+                                  color: Color(butonColor),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              IconButton(
-                                                onPressed: () async {
-                                                  VibrationController().tip(
-                                                      titresimTip: "cancel");
-                                                  var urun = urunListe
-                                                      .firstWhere(
-                                                          (item) =>
-                                                              item.urun_id ==
-                                                              gecmis.urun_id,
-                                                          orElse: () {
-                                                    UrunIslem().urunKayit(
-                                                        ".",
-                                                        gecmis.gecmis_ad,
-                                                        gecmis.satis_adet,
-                                                        gecmis.urun_fiyat);
-                                                    UrunIslem().UrunSil(
-                                                        urun_id:
-                                                            gecmis.gecmis_id,
-                                                        referans: "Gecmis");
-                                                    return Urunler(
-                                                        "", "", "", 0, 0);
-                                                  });
-
-                                                  if (urun.urun_id.isNotEmpty) {
-                                                    bool kontrol =
-                                                        await EkranUyari()
-                                                            .SilEminMisin(
-                                                      urun_id: gecmis.gecmis_id,
-                                                      mesaj:
-                                                          "${gecmis.gecmis_ad} geçmişten silmek istiyor musunuz?",
-                                                      referans: "Gecmis",
-                                                    );
-                                                    if (kontrol) {
-                                                      SepetController()
-                                                          .urunAdetGuncelle(
-                                                        urun_adet: urun
-                                                                .urun_adet +
-                                                            gecmis.satis_adet,
-                                                        urun_id: gecmis.urun_id,
-                                                      );
-                                                    }
-                                                  }
-                                                },
-                                                icon: Icon(Icons.delete,
-                                                    color: Color(backgColor)),
+                                              Text(
+                                                gecmis.gecmis_ad,
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Color(yaziColor)),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Birim Fiyatı: ${gecmis.urun_fiyat}\u{20BA}',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color:
+                                                            Color(yaziColor)),
+                                                  ),
+                                                  Text(
+                                                    "Fiyat : ${gecmis.urun_toplam} \u{20BA}",
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color:
+                                                            Color(yaziColor)),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              right: 15.0),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    "Adet: ${gecmis.satis_adet}",
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(yaziColor)),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                              onPressed: () async {
+                                                VibrationController()
+                                                    .tip(titresimTip: "cancel");
+                                                var urun = urunListe.firstWhere(
+                                                    (item) =>
+                                                        item.urun_id ==
+                                                        gecmis.urun_id,
+                                                    orElse: () {
+                                                  UrunIslem().urunKayit(
+                                                      ".",
+                                                      gecmis.gecmis_ad,
+                                                      gecmis.satis_adet,
+                                                      gecmis.urun_fiyat);
+                                                  UrunIslem().UrunSil(
+                                                      urun_id: gecmis.gecmis_id,
+                                                      referans: "Gecmis");
+                                                  return Urunler(
+                                                      "", "", "", 0, 0);
+                                                });
+
+                                                if (urun.urun_id.isNotEmpty) {
+                                                  bool kontrol =
+                                                      await EkranUyari()
+                                                          .SilEminMisin(
+                                                    urun_id: gecmis.gecmis_id,
+                                                    mesaj:
+                                                        "${gecmis.gecmis_ad} geçmişten silmek istiyor musunuz?",
+                                                    referans: "Gecmis",
+                                                  );
+                                                  if (kontrol) {
+                                                    SepetController()
+                                                        .urunAdetGuncelle(
+                                                      urun_adet:
+                                                          urun.urun_adet +
+                                                              gecmis.satis_adet,
+                                                      urun_id: gecmis.urun_id,
+                                                    );
+                                                  }
+                                                }
+                                              },
+                                              icon: Icon(Icons.delete,
+                                                  color: Color(backgColor)),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                );
-                              },
-                            );
-                          }
+                                ),
+                              );
+                            },
+                          );
                         }
                         return Center();
                       });

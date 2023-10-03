@@ -3,26 +3,36 @@
 import 'dart:async';
 import 'dart:ffi';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:stok_satis_takip/Controller/ClockController.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
 import 'package:stok_satis_takip/Controller/GecmisController.dart';
 import 'package:stok_satis_takip/Controller/VibrationController.dart';
+import 'package:stok_satis_takip/Cores/Gecmis.dart';
+import 'package:stok_satis_takip/Cores/Urunler.dart';
 
 class AnaSayfa extends StatelessWidget {
   final ClockController clockController = Get.put(ClockController());
+
+  RxDouble totalCiro = 0.0.obs;
 
   AnaSayfa({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var refGecmis = FirebaseDatabase.instance.ref().child("Gecmis");
+
     //Renkleri Getirmek için kullandığım Get metotları
     int backgColor = Get.find<renkKontrol>().backbg.value;
     int barColor = Get.find<renkKontrol>().barBg.value;
     int butonColor = Get.find<renkKontrol>().buton.value;
     int yaziColor = Get.find<renkKontrol>().yazi.value;
 
+    Rx<DateTime> anlikTarih = DateTime.now().obs;
+    DateFormat tarihFormati = DateFormat('yyyy-MM-dd');
     return Scaffold(
       backgroundColor: Color(backgColor),
       appBar: AppBar(
@@ -56,10 +66,46 @@ class AnaSayfa extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text(
-              "Ciro Buraya Gelicek",
-              style: TextStyle(fontSize: 33, color: Color(yaziColor)),
-            ),
+            StreamBuilder<DatabaseEvent>(
+                stream: refGecmis.onValue,
+                builder: (context, event) {
+                  if (event.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (event.hasError) {
+                    return Center(child: Text("Hata: ${event.error}"));
+                  } else if (!event.hasData ||
+                      event.data?.snapshot.value == null) {
+                    return Center(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Günlük Kazanç: 0.0",
+                          style:
+                              TextStyle(fontSize: 28, color: Color(yaziColor)),
+                        ),
+                      ],
+                    ));
+                  } else {
+                    var gecmisListe = <Gecmis>[];
+                    var gelenGecmis = event.data!.snapshot.value as dynamic;
+                    if (gelenGecmis != null) {
+                      totalCiro.value = 0.0;
+                      gelenGecmis.forEach((key, nesne) {
+                        if (nesne["tarih"] ==
+                            tarihFormati.format(anlikTarih.value)) {
+                          var gelenGecmis = Gecmis.fromJson(key, nesne);
+                          gecmisListe.add(gelenGecmis);
+                          totalCiro.value += gelenGecmis.urun_toplam;
+                        }
+                      });
+                    }
+                    return Text(
+                      "Günlük Kazanç: $totalCiro",
+                      style: TextStyle(fontSize: 28, color: Color(yaziColor)),
+                    );
+                  }
+                }),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

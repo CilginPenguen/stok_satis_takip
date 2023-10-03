@@ -1,9 +1,13 @@
 // ignore_for_file: file_names
 
+import 'dart:async';
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stok_satis_takip/Controller/ClockController.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
+import 'package:stok_satis_takip/Controller/GecmisController.dart';
 import 'package:stok_satis_takip/Controller/VibrationController.dart';
 
 class AnaSayfa extends StatelessWidget {
@@ -113,6 +117,7 @@ class AnaSayfa extends StatelessWidget {
                         backgroundColor: Color(butonColor)),
                     onPressed: () {
                       VibrationController().tip(titresimTip: "light");
+                      Get.toNamed("StokSayfa");
                     },
                     label: Text(
                       "Stok Az: 50",

@@ -1,15 +1,18 @@
 // ignore_for_file: file_names
 
+import 'dart:async';
+import 'dart:ffi';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:stok_satis_takip/Controller/ClockController.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
+import 'package:stok_satis_takip/Controller/GecmisController.dart';
 import 'package:stok_satis_takip/Controller/VibrationController.dart';
 import 'package:stok_satis_takip/Cores/Gecmis.dart';
 
-// ignore: must_be_immutable
 class AnaSayfa extends StatelessWidget {
   final ClockController clockController = Get.put(ClockController());
   var refGecmis = FirebaseDatabase.instance.ref().child("Gecmis");
@@ -173,7 +176,7 @@ class AnaSayfa extends StatelessWidget {
                         backgroundColor: Color(butonColor)),
                     onPressed: () {
                       VibrationController().tip(titresimTip: "light");
-                      Get.toNamed("StokSayfa");
+                      fetchData();
                     },
                     label: Text(
                       "Stok Az: 50",

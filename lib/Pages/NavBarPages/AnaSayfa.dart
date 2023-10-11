@@ -1,15 +1,12 @@
-// ignore_for_file: file_names
-
-import 'dart:async';
-import 'dart:ffi';
+// ignore_for_file: file_names, must_be_immutable
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:stok_satis_takip/Controller/ClockController.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
-import 'package:stok_satis_takip/Controller/GecmisController.dart';
 import 'package:stok_satis_takip/Controller/VibrationController.dart';
 import 'package:stok_satis_takip/Cores/Gecmis.dart';
 import 'package:stok_satis_takip/Cores/Urunler.dart';
@@ -18,12 +15,14 @@ class AnaSayfa extends StatelessWidget {
   final ClockController clockController = Get.put(ClockController());
 
   RxDouble totalCiro = 0.0.obs;
+  RxInt limit = 0.obs;
 
   AnaSayfa({super.key});
 
   @override
   Widget build(BuildContext context) {
     var refGecmis = FirebaseDatabase.instance.ref().child("Gecmis");
+    var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
 
     //Renkleri Getirmek için kullandığım Get metotları
     int backgColor = Get.find<renkKontrol>().backbg.value;
@@ -33,6 +32,7 @@ class AnaSayfa extends StatelessWidget {
 
     Rx<DateTime> anlikTarih = DateTime.now().obs;
     DateFormat tarihFormati = DateFormat('yyyy-MM-dd');
+
     return Scaffold(
       backgroundColor: Color(backgColor),
       appBar: AppBar(
@@ -155,26 +155,59 @@ class AnaSayfa extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(
-                  width: 170,
-                  height: 50,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(butonColor)),
-                    onPressed: () {
-                      VibrationController().tip(titresimTip: "light");
-                      Get.toNamed("StokSayfa");
-                    },
-                    label: Text(
-                      "Stok Az: 50",
-                      style: TextStyle(color: Color(yaziColor), fontSize: 15),
-                    ),
-                    icon: Icon(
-                      Icons.warning,
-                      color: Color(yaziColor),
-                    ),
-                  ),
-                ),
+                StreamBuilder(
+                    stream: refUrun.onValue,
+                    builder: (context, event) {
+                      if (event.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (event.hasError) {
+                        return Center(child: Text('Error: ${event.error}'));
+                      } else if (!event.hasData ||
+                          event.data?.snapshot.value == null) {
+                        return const Center(child: Text('No data available'));
+                      } else {
+                        String? limitStr = GetStorage().read("limit");
+                        if (limitStr != null) {
+                          limit.value = int.parse(limitStr);
+                        }
+                        var urunListe = <Urunler>[];
+                        var gelenUrunler =
+                            event.data!.snapshot.value as dynamic;
+                        if (gelenUrunler != null) {
+                          gelenUrunler.forEach((key, nesne) {
+                            //print(nesne["urun_ad"].runtimeType); //bu önemli
+                            if (limit.value >= nesne["urun_adet"]) {
+                              var gelenUrun = Urunler.fromJson(key, nesne);
+                              urunListe.add(gelenUrun);
+                            }
+                          });
+                        }
+                        return SizedBox(
+                          width: 170,
+                          height: 50,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(butonColor)),
+                            onPressed: () {
+                              VibrationController().tip(titresimTip: "light");
+                              Get.toNamed("StokSayfa");
+                            },
+                            label: Text(
+                              "Stok Az: ${urunListe.length}",
+                              style: urunListe.isNotEmpty
+                                  ? const TextStyle(
+                                      color: Colors.red, fontSize: 18)
+                                  : TextStyle(
+                                      color: Color(yaziColor), fontSize: 15),
+                            ),
+                            icon: Icon(
+                              Icons.warning,
+                              color: Color(yaziColor),
+                            ),
+                          ),
+                        );
+                      }
+                    }),
                 SizedBox(
                   height: 50,
                   width: 170,

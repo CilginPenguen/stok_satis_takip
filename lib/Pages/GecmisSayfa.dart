@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:stok_satis_takip/Controller/ColorController.dart';
-import 'package:stok_satis_takip/Controller/GecmisController.dart';
 import 'package:stok_satis_takip/Controller/SepetController.dart';
 import 'package:stok_satis_takip/Controller/SnackController.dart';
 import 'package:stok_satis_takip/Controller/UrunController.dart';
@@ -238,7 +237,6 @@ class GecmisSayfa extends StatelessWidget {
                             },
                           );
                         }
-                        return Center();
                       });
                 }
               }),

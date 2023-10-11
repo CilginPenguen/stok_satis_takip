@@ -1,7 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:stok_satis_takip/Controller/SnackController.dart';
 import 'package:stok_satis_takip/Controller/VibrationController.dart';
 import 'package:stok_satis_takip/Cores/Urunler.dart';
@@ -46,7 +45,6 @@ class UrunlerSayfasi extends StatelessWidget {
                 urunListe.add(gelenUrun);
               });
             }
-
             return ListView.builder(
               itemCount: urunListe.length,
               itemBuilder: (context, i) {

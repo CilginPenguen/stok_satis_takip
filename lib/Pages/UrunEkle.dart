@@ -18,7 +18,6 @@ class UrunEklePage extends StatelessWidget {
   });
 
   var boolcuk = false.obs;
-  String errorYaka = "";
 
   int backgColor = Get.find<renkKontrol>().backbg.value;
   int barColor = Get.find<renkKontrol>().barBg.value;

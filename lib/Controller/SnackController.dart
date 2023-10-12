@@ -283,55 +283,59 @@ class EkranUyari extends GetxController {
             ],
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              OutlinedButton.icon(
-                //Evet Butonu
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(
-                    width: 5.0,
-                    color: Color.fromARGB(255, 19, 102, 21),
+              Expanded(
+                flex: 5,
+                child: OutlinedButton.icon(
+                  //Evet Butonu
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(
+                      width: 4.0,
+                      color: Color.fromARGB(255, 19, 102, 21),
+                    ),
                   ),
-                ),
-                onPressed: () {
-                  UrunIslem().urunGuncelle(
-                      urun_barkod: tfBarkod.text,
-                      urun_id: urun_id,
-                      urun_ad: tfUrunAd.text,
-                      urun_adet: int.parse(tfUrunAdet.text),
-                      urun_fiyat: num.parse(tfUrunFiyat.text));
-                },
-                icon: const Icon(
-                  Icons.cloud,
-                  color: Color.fromARGB(255, 19, 102, 21),
-                  size: 32,
-                ),
-                label: const Text(
-                  "Güncelle",
-                  style: TextStyle(color: Colors.white, fontSize: 15),
+                  onPressed: () {
+                    UrunIslem().urunGuncelle(
+                        urun_barkod: tfBarkod.text,
+                        urun_id: urun_id,
+                        urun_ad: tfUrunAd.text,
+                        urun_adet: int.parse(tfUrunAdet.text),
+                        urun_fiyat: num.parse(tfUrunFiyat.text));
+                  },
+                  icon: const Icon(
+                    Icons.save,
+                    color: Color.fromARGB(255, 19, 102, 21),
+                    size: 28,
+                  ),
+                  label: const Text(
+                    "Kaydet",
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              OutlinedButton.icon(
-                //Hayır Butonu
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(
-                    width: 5.0,
-                    color: Color.fromARGB(255, 152, 34, 26),
+              Expanded(
+                flex: 4,
+                child: OutlinedButton.icon(
+                  //Hayır Butonu
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(
+                      width: 4.0,
+                      color: Color.fromARGB(255, 152, 34, 26),
+                    ),
                   ),
-                ),
-                onPressed: () {
-                  Get.back();
-                  VibrationController().tip(titresimTip: "cancel");
-                },
-                icon: const Icon(
-                  Icons.cancel_outlined,
-                  color: Color.fromARGB(255, 152, 34, 26),
-                  size: 32,
-                ),
-                label: const Text(
-                  "İptal",
-                  style: TextStyle(color: Colors.white, fontSize: 15),
+                  onPressed: () {
+                    Get.back();
+                    VibrationController().tip(titresimTip: "cancel");
+                  },
+                  icon: const Icon(
+                    Icons.cancel_outlined,
+                    color: Color.fromARGB(255, 152, 34, 26),
+                    size: 28,
+                  ),
+                  label: const Text(
+                    "İptal",
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
                 ),
               ),
             ],

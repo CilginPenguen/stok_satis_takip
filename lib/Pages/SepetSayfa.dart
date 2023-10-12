@@ -233,7 +233,7 @@ class SepetSayfa extends StatelessWidget {
                         Row(
                           children: [
                             Expanded(
-                              flex: 3,
+                              flex: 5,
                               child: Container(
                                 child: Center(
                                   child: Text(
@@ -241,14 +241,14 @@ class SepetSayfa extends StatelessWidget {
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                       color: Color(yaziColor),
-                                      fontSize: 13,
+                                      fontSize: 18,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                             Expanded(
-                              flex: 7,
+                              flex: 5,
                               child: Container(
                                 color: Color(barColor),
                                 child: ElevatedButton.icon(
@@ -273,7 +273,7 @@ class SepetSayfa extends StatelessWidget {
                                   icon: Icon(
                                     Icons.done,
                                     color: Color(yaziColor),
-                                    size: 48,
+                                    size: 25,
                                   ),
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.green,
@@ -283,7 +283,7 @@ class SepetSayfa extends StatelessWidget {
                                     "Alışverişi Tamamla",
                                     style: TextStyle(
                                       color: Color(yaziColor),
-                                      fontSize: 20,
+                                      fontSize: 18,
                                     ),
                                   ),
                                 ),

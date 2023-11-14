@@ -23,6 +23,8 @@ class AnaSayfa extends StatelessWidget {
   Widget build(BuildContext context) {
     var refGecmis = FirebaseDatabase.instance.ref().child("Gecmis");
     var refUrun = FirebaseDatabase.instance.ref().child("Urunler");
+    double fontSize = MediaQuery.of(context).devicePixelRatio *
+        7.9; // Örneğin, cihazın piksel yoğunluğunun 10 katı olarak belirleme BUNU Bİ DENE SONRA
 
     //Renkleri Getirmek için kullandığım Get metotları
     int backgColor = Get.find<renkKontrol>().backbg.value;
@@ -122,7 +124,8 @@ class AnaSayfa extends StatelessWidget {
                     },
                     label: Text(
                       "Ürün Ekle",
-                      style: TextStyle(color: Color(yaziColor), fontSize: 17),
+                      style: TextStyle(
+                          color: Color(yaziColor), fontSize: fontSize),
                     ),
                     icon: Icon(
                       Icons.add_circle_outline,
@@ -146,7 +149,8 @@ class AnaSayfa extends StatelessWidget {
                     ),
                     label: Text(
                       "Alışveriş",
-                      style: TextStyle(color: Color(yaziColor), fontSize: 17),
+                      style: TextStyle(
+                          color: Color(yaziColor), fontSize: fontSize),
                     ),
                   ),
                 ),

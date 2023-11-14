@@ -48,6 +48,9 @@ class StokSayfa extends StatelessWidget {
                 child: TextField(
                   textAlign: TextAlign.center,
                   keyboardType: TextInputType.number,
+                  onTapOutside: (event) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   style: TextStyle(color: Color(yaziColor)),
                   controller: TextEditingController(text: "${tfLimit.value}"),
                   onChanged: (value) {
